@@ -1,9 +1,9 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1220"><title>V2V Visionaries · Scenario Lab</title></head><body style="margin:0;background:#0a1220;color:#e8f0fa;font:14px system-ui;padding:24px">Loading V2V Visionaries Scenario Lab…<script type="module">
 try {
- const names=["bundle-0.txt","bundle-1.txt"];
- const parts=await Promise.all(names.map(async name=>{const r=await fetch("./"+name);if(!r.ok)throw Error("Could not load "+name);return (await r.text()).trim()}));
- const bytes=Uint8Array.from(atob(parts.join("")),c=>c.charCodeAt(0));
- const page=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
- document.open();document.write(page);document.close();
-} catch(e) { document.body.textContent="Unable to load test console: "+e.message; }
+ const names = Array.from({length: 4}, (_, i) => `bundle-${i}.txt`);
+ const parts = await Promise.all(names.map(async name => { const r = await fetch(`./${name}`); if (!r.ok) throw new Error(`Could not load ${name}`); return (await r.text()).trim(); }));
+ const bytes = Uint8Array.from(atob(parts.join("")), c => c.charCodeAt(0));
+ const page = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+ document.open(); document.write(page); document.close();
+} catch (error) { document.body.textContent = `Unable to load Scenario Lab: ${error.message}`; }
 </script></body></html>
