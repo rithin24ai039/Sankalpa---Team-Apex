@@ -1,10 +1,10 @@
 # V2V Visionaries Scenario Lab
 
-A browser-based manual/V2V and video-input test harness.
+A self-contained browser test interface with two modes: manual/V2V input and local video processing.
 
 ## Run
 
-Open `index.html` in a recent browser or serve this folder:
+Open `index.html` in a recent browser or serve this directory:
 
 ```bash
 python -m http.server 8080
@@ -12,25 +12,27 @@ python -m http.server 8080
 
 Visit `http://localhost:8080`.
 
+The main page has no separate application-bundle fetch at startup. Video-mode model files are downloaded from jsDelivr only after clicking **Load vehicle detector**.
+
 ## Manual / V2V input
 
-Enter local and remote vehicle states in the shared metric coordinate frame, or generate and validate a versioned V2V JSON fixture. The baseline computes constant-velocity closest approach and a conservative vehicle-envelope clearance heuristic.
+Enter local and remote vehicle states in the same metric map frame, or generate and validate a versioned V2V JSON fixture. The baseline estimates constant-velocity closest approach and conservative vehicle-envelope clearance.
 
 ## Upload & process video
 
-1. Switch the top input selector to **Upload & process video**.
-2. Select an MP4/WebM or other browser-decodable video file (up to 300 MB).
-3. Click **Load vehicle detector**. First use requires internet access to load TensorFlow.js and COCO-SSD from jsDelivr.
-4. Adjust confidence threshold, frame width and processing interval.
-5. Click **Start processing**. The UI overlays detections and reports frame times, classes, confidence, short-lived IDs and pixel-space motion.
-6. Export detections as JSON.
+1. Switch to **Upload & process video**.
+2. Select a browser-supported local video file (up to 300 MB).
+3. Click **Load vehicle detector**. The first load requires internet access to jsDelivr for TensorFlow.js and COCO-SSD.
+4. Adjust confidence threshold, frame sampling interval and processing width.
+5. Click **Start processing**. The browser overlays supported road-user detections and reports timestamps, classes, confidence, temporary centroid-associated IDs and pixel-space movement.
+6. Export detection results to JSON.
 
-Video is processed locally in the browser and is not uploaded to a server. A local file stays within the current browser tab.
+Video is decoded and processed locally in the browser. The clip is not uploaded to Vercel or Supabase.
 
 ## Detector and limitations
 
-The video mode uses generic COCO-SSD `lite_mobilenet_v2` weights through TensorFlow.js. It does not load Team Apex's YOLO weights. The prototype recognises car, motorcycle, bus, truck, bicycle and person labels. Its lightweight nearest-centroid tracker is not ByteTrack or SORT.
+Video mode uses generic COCO-SSD `lite_mobilenet_v2` weights. It is not an integration of Team Apex's YOLO weights. A lightweight nearest-centroid association is used for temporary IDs; it is not ByteTrack or SORT.
 
-Image-space pixel velocity is not physical speed. This mode does not infer metric coordinates, trajectories, TTC or collision risk. Those need camera calibration, ground-plane projection, shared coordinate-frame alignment, road/lane context and validated tracking. Performance depends on the browser and hardware; reduce width or inference frequency for slower devices.
+Image-space pixel speed is not physical speed. Video mode does not infer metric coordinates, trajectories, TTC or collision risk. These require camera calibration, ground-plane mapping, shared coordinate-frame alignment, road/lane context and validated tracking.
 
-See `docs/VIDEO_INPUT_PIPELINE.md` for the pipeline and validation boundary.
+See `../docs/VIDEO_INPUT_PIPELINE.md` for the research boundary. This is not a certified automotive safety system.
