@@ -2,18 +2,18 @@
 
 Research workspace for the integrated road-safety and cooperative collision-avoidance prototype.
 
-**Live temporary-input test console:** https://v2v-visionaries-scenario-lab.vercel.app/
+**Live Scenario Lab:** https://v2v-visionaries-scenario-lab.vercel.app/
 
-## What's in this repository
+## What's included
 
-- **`web-console/`** — static browser-based Scenario Lab. Enter temporary vehicle states, compare a local observation with a versioned V2V test packet, inspect closest-approach geometry, and run built-in checks.
-- **`docs/`** — Unity simulation audit, V2V message draft, baseline risk-engine assumptions and deployment notes.
+- `web-console/` — a browser Scenario Lab with two input modes: manual/V2V test data and local video upload with browser-side object detection.
+- `docs/` — the Unity simulation audit, V2V message draft, baseline risk-engine assumptions, video pipeline notes and deployment status.
 
-The Unity island-city simulation was supplied as a separate project archive in the task. Its audit is recorded in `docs/SIMULATION_AUDIT.md`; the complete cleaned Unity project is included in the downloadable source bundle supplied with this task. The browser console is not a Unity plug-in and does not connect to the Unity runtime.
+The Unity island-city simulation was supplied as a separate project archive. Its audit is recorded in `docs/SIMULATION_AUDIT.md`; the full Unity project is included in the downloadable project ZIP supplied in this conversation.
 
-## Run the console locally
+## Run the web console
 
-Open `web-console/index.html` in a modern browser. No build process, API key, server, or database is required. To serve it over HTTP:
+Open `web-console/index.html` in a recent browser, or serve it locally:
 
 ```bash
 cd web-console
@@ -21,6 +21,14 @@ python -m http.server 8080
 ```
 
 Visit `http://localhost:8080`.
+
+## Input modes
+
+**Manual / V2V data** uses temporary vehicle states or a versioned JSON fixture and the constant-velocity closest-approach baseline.
+
+**Upload & process video** accepts a browser-supported local video file (up to 300 MB). It loads TensorFlow.js and the COCO-SSD `lite_mobilenet_v2` detector from jsDelivr and runs frame inference in the browser. It overlays detected cars, motorcycles, buses, trucks, bicycles and people, associates detections using short-lived centroid tracks, and exports detection metadata.
+
+The first model load requires internet. Video content stays in the browser tab; the clip is not uploaded to Vercel or Supabase.
 
 ## Run automated tests
 
@@ -31,14 +39,14 @@ cd web-console
 npm test
 ```
 
-## Data handling
+## Research boundaries
 
-Test inputs are temporary browser values. The recent event log is kept in the current tab's `sessionStorage` and can be exported to JSON. There is no account, backend or Supabase database because this workflow is for disposable test fixtures rather than persistent shared records.
+COCO-SSD is a generic model, not Team Apex's YOLO weights. Video mode reports bounding boxes, confidence, short-lived track IDs and pixel-space displacement. It does not infer physical speed, metric coordinates, trajectories, TTC or collision risk. Those require camera calibration, ground-plane mapping, road/lane context and validated tracking. The centroid association is a lightweight prototype, not ByteTrack or SORT.
 
-## Research boundary
+The Unity project is a simulation foundation. As documented in `docs/SIMULATION_AUDIT.md`, the team's camera capture, YOLO integration, metric movement estimation, trajectory prediction, collision assessment and real UDP V2V transport still require implementation and validation in the Unity/runtime system.
 
-The console calculates a constant-velocity closest-point-of-approach baseline from manually entered values. It is not a camera, YOLO, tracking, trajectory-learning or live UDP implementation. Risk bands are explicit geometric heuristics, not calibrated probabilities. This is not a certified automotive safety system and must not be used for real driving decisions.
+This is not a certified automotive safety system. Do not use it for real driving or safety decisions.
 
-## Deployment note
+## Deployment
 
-The current Vercel production deployment was uploaded directly from the committed static files. The GitHub integration is not connected to this Vercel project yet, so pushing later Git commits will **not** automatically redeploy it until GitHub is connected in Vercel Project Settings.
+The current Vercel deployment is uploaded directly from static files. GitHub auto-deploy is not connected yet; see `docs/DEPLOYMENT_STATUS.md` before assuming that future Git pushes automatically update the live site.
